@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lớp Học</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #eef2f7;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: #343a40;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .filters select, .filters button {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            background-color: #f8f9fa;
+            transition: all 0.2s ease;
+        }
+
+        .filters select:hover, .filters button:hover {
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+
+        .filters button.search {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .filters button.search:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+        .filters button.reset {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .filters button.reset:hover {
+            background-color: #c82333;
+            transform: scale(1.05);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #28a745;
+            color: white;
+            font-weight: bold;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        tr:nth-child(even) td {
+            background-color: #f2f2f2;
+        }
+
+        td, th {
+            padding: 12px;
+            text-align: center;
+        }
+
+        td .actions button {
+            margin: 0 5px;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        td .actions button.edit {
+            background-color: #ffc107;
+            color: white;
+        }
+
+        td .actions button.edit:hover {
+            background-color: #e0a800;
+            transform: scale(1.1);
+        }
+
+        td .actions button.delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        td .actions button.delete:hover {
+            background-color: #c82333;
+            transform: scale(1.1);
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .modal button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal button:hover {
+            background-color: #218838;
+        }
+
+        .modal button.cancel {
+            background-color: #dc3545;
+        }
+
+        .modal button.cancel:hover {
+            background-color: #c82333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Lớp Học</h1>
+        </div>
+
+        <div class="filters">
+            <select id="faculty">
+                <option value="">Tất cả Khoa</option>
+                <option value="Công Nghệ Thông Tin">Công Nghệ Thông Tin</option>
+            </select>
+            <select id="major">
+                <option value="">Chọn chuyên ngành</option>
+                <option value="Phát triển phần mềm">Phát triển phần mềm</option>
+                <option value="Công nghệ thông tin">Công nghệ thông tin</option>
+            </select>
+            <select id="year">
+                <option value="">Tất cả niên khóa</option>
+                <option value="2022-2026">2022-2026</option>
+            </select>
+            <button class="search" onclick="searchData()">Tìm kiếm</button>
+            <button class="reset" onclick="resetFilters()">Làm mới</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Tên lớp</th>
+                    <th>Mã lớp</th>
+                    <th>Khoa</th>
+                    <th>Chuyên ngành</th>
+                    <th>Niên khóa</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Example rows removed for clarity and security -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal for Editing -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <h2>Sửa thông tin lớp học</h2>
+            <label for="editClassName">Tên lớp:</label>
+            <input type="text" id="editClassName" />
+            <label for="editClassCode">Mã lớp:</label>
+            <input type="text" id="editClassCode" />
+            <button onclick="saveChanges()">Lưu</button>
+            <button class="cancel" onclick="closeModal()">Hủy</button>
+        </div>
+    </div>
+
+    <script>
+        let currentRow;
+
+        function searchData() {
+            const faculty = document.getElementById('faculty').value;
+            const major = document.getElementById('major').value;
+            const year = document.getElementById('year').value;
+
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                const rowFaculty = cells[2].textContent.trim();
+                const rowMajor = cells[3].textContent.trim();
+                const rowYear = cells[4].textContent.trim();
+
+                const isMatch = 
+                    (!faculty || rowFaculty === faculty) &&
+                    (!major || rowMajor === major) &&
+                    (!year || rowYear === year);
+
+                row.style.display = isMatch ? '' : 'none';
+            });
+        }
+
+        function resetFilters() {
+            document.getElementById('faculty').value = '';
+            document.getElementById('major').value = '';
+            document.getElementById('year').value = '';
+
+            const rows = document.querySelectorAll('#tableBody tr');
+            rows.forEach(row => {
+                row.style.display = '';
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
